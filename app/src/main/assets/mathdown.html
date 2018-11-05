@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>MathDown</title>
+    <link rel="stylesheet" href="github-markdown.css">
+    <style>
+    @media screen {
+      html, body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+      }
+      .wrapper {
+        width: 50%;
+        height: 100vh;
+        margin: 0;
+        padding: 0.8rem 0;
+        overflow: hidden;
+      }
+      .preview { float: right; }
+      .editor { float: left; }
+      .editor.wrapper { background-color: rgba(128, 128, 128, 0.1); }
+
+      .cover {
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+      }
+      #editor {
+        border: none;
+        outline: none;
+        resize: none;
+        font-size: 1rem;
+        color: inherit;
+      }
+      #editor, #preview {
+        padding: 0 0.8rem;
+        overflow: auto;
+      }
+      #toggle-theme {
+        position: absolute;
+        top: 0.4rem;
+        right: 0.4rem;
+        height: 1.5rem;
+        width: 1.5rem;
+        font-size: 100%;
+        border: none;
+        padding: 0;
+        background-color: #f3f3f3;
+        cursor: pointer;
+      }
+      .night-mode {
+        background-color: #212121;
+        color: #e0e0e0;
+      }
+      code, table { color: #000000 !important; }
+      .container { overflow: hidden; }
+    }
+    @media screen and (max-width: 599px) {
+      .wrapper {
+        height: 50vh;
+        width: 100%;
+      }
+    }
+    @media print {
+      .editor.wrapper, #toggle-theme { display: none; }
+      .preview.wrapper { width: 100%; }
+      .preview { color: #000000; }
+    }
+    </style>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: { inlineMath: [['`', '`']] },
+        asciimath2jax: { delimiters: [['$','$']] },
+        showMathMenu: false
+      });
+    </script>
+    <script type="text/javascript" async
+            src="MathJax/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+    <script type="text/javascript" async
+            src="markdown-it.min.js">
+    </script>
+  </head>
+  <body class="markdown-body">
+    <main role="main" class="container">
+      <div class="editor wrapper">
+        <textarea id="editor" class="cover" spellcheck="false" placeholder="### Mathdown"></textarea>
+      </div>
+      <div class="preview wrapper">
+        <div id="preview" class="cover">
+          <h3>Mathdown</h3>
+        </div>
+      </div>
+    </main>
+    <button id="toggle-theme">&#9775;</button>
+
+    <script>
+      function updatePreview(converter) {
+        MathJax.Hub.Queue(function() {
+          if (editor.value == "")
+            preview.innerHTML = converter.render(editor.placeholder);
+          else
+            preview.innerHTML = converter.render(editor.value);
+        });
+        MathJax.Hub.Queue(["Typeset", MathJax.Hub, "preview"]);
+      }
+      function lockScroll(trigger, target) {
+        /* var mouseIn = true;
+        trigger.onmouseover = function() { mouseIn = true; }
+        trigger.onmouseleave = function() { mouseIn = false; } */
+        trigger.onscroll = function() {
+          // if (mouseIn) {
+            var scale = (target.scrollHeight - target.offsetHeight) / (this.scrollHeight - this.offsetHeight)
+            target.scrollTop = this.scrollTop * scale;
+          // }
+        }
+      }
+      window.onload = function() {
+        var editor = document.getElementById("editor");
+        var preview = document.getElementById("preview");
+        var toggleTheme = document.getElementById("toggle-theme");
+        var converter = markdownit().set({ html: true });
+
+        if (localStorage && localStorage.editorText) {
+          editor.value = localStorage.editorText;
+          updatePreview(converter);
+        }
+        editor.oninput = function() {
+          updatePreview(converter);
+          localStorage.editorText = editor.value;
+        }
+        toggleTheme.onclick = function() {
+          document.body.classList.toggle("night-mode");
+        }
+        lockScroll(editor, preview);
+      }
+    </script>
+  </body>
+</html>

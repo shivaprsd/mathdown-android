@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MathDown</string>
+    <string name="print_label">Print</string>
+</resources>
